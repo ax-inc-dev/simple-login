@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログインテスト</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border-left: 4px solid #c33;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* ログイン成功画面のスタイル */
+        .welcome-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .welcome-screen.show {
+            display: block;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .success-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: white;
+            stroke-width: 3;
+            fill: none;
+        }
+
+        .welcome-screen h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .secret-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .secret-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .secret-phrase {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .logout-btn {
+            background: #f0f0f0;
+            color: #333;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ログイン画面 -->
+        <div id="loginScreen">
+            <div class="header">
+                <h1>🔐 ログイン</h1>
+                <p>アカウント情報を入力してください</p>
+            </div>
+
+            <div class="error-message" id="errorMessage">
+                IDまたはパスワードが正しくありません
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="userId">ID</label>
+                    <input 
+                        type="text" 
+                        id="userId" 
+                        placeholder="tone_kohsuke@a-x.inc"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">パスワード</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        placeholder="パスワードを入力"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn">ログイン</button>
+            </form>
+        </div>
+
+        <!-- ログイン後の画面 -->
+        <div id="welcomeScreen" class="welcome-screen">
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+
+            <h1>✨ ログイン成功</h1>
+
+            <div class="secret-box">
+                <div class="secret-label">🔑 秘密の合言葉</div>
+                <div class="secret-phrase">1000万時間開放</div>
+            </div>
+
+            <button class="logout-btn" onclick="logout()">ログアウト</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM要素の取得
+        const loginForm = document.getElementById('loginForm');
+        const loginScreen = document.getElementById('loginScreen');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const errorMessage = document.getElementById('errorMessage');
+        const userIdInput = document.getElementById('userId');
+        const passwordInput = document.getElementById('password');
+
+        // 正しい認証情報
+        const CORRECT_ID = 'tone_kohsuke@a-x.inc';
+        const CORRECT_PASSWORD = 'testoneko';
+
+        // ログイン処理
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const userId = userIdInput.value;
+            const password = passwordInput.value;
+
+            // 認証チェック
+            if (userId === CORRECT_ID && password === CORRECT_PASSWORD) {
+                // ログイン成功
+                errorMessage.classList.remove('show');
+                loginScreen.classList.add('hidden');
+                welcomeScreen.classList.add('show');
+                
+                // フォームをリセット
+                loginForm.reset();
+            } else {
+                // ログイン失敗
+                errorMessage.classList.add('show');
+                
+                // パスワードフィールドをクリア
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        });
+
+        // ログアウト処理
+        function logout() {
+            welcomeScreen.classList.remove('show');
+            loginScreen.classList.remove('hidden');
+            errorMessage.classList.remove('show');
+            userIdInput.focus();
+        }
+
+        // 初期フォーカス
+        window.addEventListener('load', function() {
+            userIdInput.focus();
+        });
+
+        // エラーメッセージの自動非表示
+        userIdInput.addEventListener('input', function() {
+            errorMessage.classList.remove('show');
+        });
+
+        passwordInput.addEventListener('input', function() {
+            errorMessage.classList.remove('show');
+        });
+    </script>
+</body>
+</html>
